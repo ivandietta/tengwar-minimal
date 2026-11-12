@@ -1,9 +1,9 @@
 # Project brief
 
 **Minimalist Android launcher with on-device screen-time stats and a habit tracker.**
-Working title: _TBD_ (see [Open decisions](#12-open-decisions)).
+Name: **Tengwar Minimal** (see [Open decisions](#12-open-decisions)).
 
-Brief v1 · 10 November 2026 · Status: planning, no code yet.
+Brief v1.1 · 11 November 2026 · Status: M0 in progress.
 
 This document is the starting context for the project: what we are building, what is in and out of v1, the technical decisions taken so far, and the order of work. `CLAUDE.md` holds the short rules that load in every Claude Code session; this file holds the reasoning. Update it when a decision changes.
 
@@ -24,7 +24,8 @@ The bet: usage numbers and habits work better on the screen you see every time y
 | Topic | Decision |
 |---|---|
 | Codebase | Written from scratch. No code copied or adapted from other launchers or habit trackers. |
-| Openness | Open source, public GitHub repository. License: see [Open decisions](#12-open-decisions). |
+| Openness | Open source, public GitHub repository from the first commit. License: GPL-3.0. |
+| Name | Tengwar Minimal. Application ID and Kotlin package: `io.github.ivandietta.tengwarminimal`. |
 | Language | English for code, comments, commits, docs and UI strings. |
 | v1 scope | Launcher + phone usage + habits + pause before opening (section 3). |
 | Distribution | APK on GitHub Releases. |
@@ -128,7 +129,7 @@ These are the starting decisions. Each one becomes a short ADR in `docs/decision
 | M4 Pause before opening | v0.4.0 | about 1 week |
 | M5 Polish and launch | v1.0.0 | 1 to 2 weeks |
 
-The M1 to M4 figures come from the one-page design and assume about 10 hours a week from someone who already programs. M0 and M5 are rough additions. Re-estimate after M1, when there is real data on pace. Current status: **M0 not started.**
+The M1 to M4 figures come from the one-page design and assume about 10 hours a week from someone who already programs. M0 and M5 are rough additions. Re-estimate after M1, when there is real data on pace. Current status: **M0 in progress.**
 
 ### M0 Foundation
 
@@ -235,7 +236,7 @@ The M1 to M4 figures come from the one-page design and assume about 10 hours a w
 - **Channel:** GitHub Releases. Pre-releases for v0.x, a full release for v1.0.0.
 - **Versioning:** semantic versions, a `versionCode` that always increases, and a `CHANGELOG.md` with user-visible changes.
 - **Signing:** one release keystore, created once, kept out of the repository and backed up in two places. If it is lost, existing installs cannot be updated. CI signs from repository secrets.
-- **Application ID:** permanent in practice. Changing it later makes Android treat the app as a different one. Settle it before v0.1.0 (open decision 1).
+- **Application ID:** permanent in practice. Changing it later makes Android treat the app as a different one. Settled in M0 as `io.github.ivandietta.tengwarminimal` (decision 1).
 - **Developer verification:** Google is rolling out identity verification for developers of apps installed on certified Android devices, including apps installed outside Google Play. Per Google's published schedule it starts with installs from major app stores in a first group of countries on 30 September 2026, and is planned to cover all apps on certified devices worldwide in 2027. Once it applies, installing an APK from an unverified developer requires the user to complete a one-time "advanced flow" or to use ADB. As of November 2026 the Android Developer Console lists a free limited-distribution account (no government ID, up to 20 devices) and a full-distribution account (US$25, identity verification). Check the current rules before v1.0.0 (open decision 5).
 
 ## 11. Showcase plan
@@ -262,14 +263,16 @@ The project supports two claims: "I can build Android software" and "I can direc
 
 ## 12. Open decisions
 
-| # | Decision | Needed by | Proposal |
-|---|---|---|---|
-| 1 | App name and application ID | Before v0.1.0 | `io.github.<github-user>.<name>`; check the name is not taken by another launcher. |
-| 2 | License | Before the first public commit | See note below. |
-| 3 | Does this launcher's own foreground time count as screen time? | M2 | No: report time spent in other apps. |
-| 4 | Public from the first commit, or from v0.1.0? | M0 | From the first commit; the history is part of the showcase. |
-| 5 | Developer verification account type | Before v1.0.0 | Limited distribution while testing; decide on full distribution for the public release. |
-| 6 | LinkedIn posts in Spanish, English or both | First post | Maintainer's call. |
+| # | Decision | Needed by | Proposal | Status |
+|---|---|---|---|---|
+| 1 | App name and application ID | Before v0.1.0 | `io.github.<github-user>.<name>`; check the name is not taken by another launcher. | **Decided** 11 Nov 2026: Tengwar Minimal, `io.github.ivandietta.tengwarminimal`. Closed in M0 because M0 names the public repository and renames the template's package. |
+| 2 | License | Before the first public commit | See note below. | **Decided** 11 Nov 2026: GPL-3.0. |
+| 3 | Does this launcher's own foreground time count as screen time? | M2 | No: report time spent in other apps. | Open |
+| 4 | Public from the first commit, or from v0.1.0? | M0 | From the first commit; the history is part of the showcase. | **Decided** 11 Nov 2026: public from the first commit. |
+| 5 | Developer verification account type | Before v1.0.0 | Limited distribution while testing; decide on full distribution for the public release. | Open |
+| 6 | LinkedIn posts in Spanish, English or both | First post | Maintainer's call. | Open |
+| 7 | Static analysis in CI besides Android Lint | M0 | ktlint. detekt's stable line (1.x) lags behind current Kotlin, and 2.0 is still in alpha. | **Decided** 11 Nov 2026: ktlint, recorded in ADR-0001. |
+| 8 | Android system backup. The template sets `allowBackup="true"`, which lets Android copy app data to the user's cloud backup. | Before M2 stores data | Exclude app data from cloud backup and keep device-to-device transfer. Export and import (M5) stays the supported way to move data. | Open |
 
 **License note.** Because the code is written from scratch, any open-source license is available, and while the maintainer is the only author it can be changed for future versions. The practical question is what others may do with it. GPL-3.0: anyone who distributes a modified version must publish its source, so derived apps stay open. Apache-2.0: anyone may reuse the code, including in closed apps, by keeping the license notice. The planned dependencies (AndroidX, Kotlin) are Apache-2.0, which can be combined into a GPL-3.0 app. Suggested: GPL-3.0 for an end-user app. This is not legal advice.
 
