@@ -1,0 +1,26 @@
+# Gradle and Kotlin build output
+.gradle
+.kotlin
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Machine-specific configuration
+local.properties
+
+# Signing keys and their passwords: never commit them
+*.jks
+*.keystore
+keystore.properties
+
+# Android Studio and IntelliJ
+*.iml
+/.idea/
+
+# macOS
+.DS_Store
+
+# Personal Claude Code files
+CLAUDE.local.md
+.claude/settings.local.json
