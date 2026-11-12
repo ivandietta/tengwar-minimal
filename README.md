@@ -6,7 +6,7 @@ A minimalist Android launcher with on-device screen-time stats and a habit track
 
 ## Privacy
 
-Tengwar Minimal never declares the `android.permission.INTERNET` permission, so it cannot reach the network on its own. There are no accounts, analytics, ads or crash reporting.
+Tengwar Minimal never declares the `android.permission.INTERNET` permission, so it cannot reach the network on its own. CI fails any change that adds it, including through a library. There are no accounts, analytics, ads or crash reporting.
 
 ## Build from source
 
