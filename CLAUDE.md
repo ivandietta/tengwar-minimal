@@ -10,11 +10,12 @@ Scope, technical decisions, roadmap and acceptance criteria are in `docs/PROJECT
 - Unit tests: `./gradlew testDebugUnitTest`
 - One test class: `./gradlew testDebugUnitTest --tests "*.ClassNameTest"`
 - Lint: `./gradlew lintDebug`
+- No-network check on every variant's merged manifest: `./gradlew checkNoInternetPermission`
 - Install on the connected device or emulator: `./gradlew installDebug`
 - Instrumented tests (need a device or emulator): `./gradlew connectedDebugAndroidTest`
 - In Windows PowerShell or cmd, use `.\gradlew.bat` in place of `./gradlew`.
 
-Before saying a task is done, run build, unit tests and lint, and show the output.
+Before saying a task is done, run build, unit tests, lint and the no-network check, and show the output.
 
 ## Project rules
 

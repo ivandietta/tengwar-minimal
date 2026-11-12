@@ -1,3 +1,7 @@
+import com.android.build.api.artifact.SingleArtifact
+import javax.xml.parsers.DocumentBuilderFactory
+import org.w3c.dom.Element
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -52,4 +56,63 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+// The app must never have network access (brief, principle 1). These checks read each
+// variant's merged manifest, so they also catch a permission that a library adds.
+val checkNoInternetPermission = tasks.register("checkNoInternetPermission") {
+    group = "verification"
+    description = "Fails if the merged manifest of any variant requests android.permission.INTERNET."
+}
+
+tasks.named("check") {
+    dependsOn(checkNoInternetPermission)
+}
+
+androidComponents {
+    onVariants { variant ->
+        val variantCheck = tasks.register<NoInternetPermissionCheck>(
+            "check${variant.name.replaceFirstChar { it.uppercase() }}NoInternetPermission",
+        ) {
+            mergedManifest.set(variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+        }
+        checkNoInternetPermission.configure { dependsOn(variantCheck) }
+    }
+}
+
+abstract class NoInternetPermissionCheck : DefaultTask() {
+    @get:InputFile
+    abstract val mergedManifest: RegularFileProperty
+
+    @TaskAction
+    fun check() {
+        val manifest = mergedManifest.get().asFile
+        val document = DocumentBuilderFactory.newInstance()
+            .apply { isNamespaceAware = true }
+            .newDocumentBuilder()
+            .parse(manifest)
+
+        val offendingTags = PERMISSION_REQUEST_TAGS.filter { tag ->
+            val elements = document.getElementsByTagName(tag)
+            (0 until elements.length).any { index ->
+                val element = elements.item(index) as Element
+                element.getAttributeNS(ANDROID_NAMESPACE, "name") == INTERNET_PERMISSION
+            }
+        }
+
+        if (offendingTags.isNotEmpty()) {
+            throw GradleException(
+                "The merged manifest $manifest requests $INTERNET_PERMISSION " +
+                    "in <${offendingTags.joinToString("> and <")}>. Tengwar Minimal must not " +
+                    "have network access. The manifest merger report in " +
+                    "app/build/outputs/logs/ shows which manifest added it.",
+            )
+        }
+    }
+
+    private companion object {
+        const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
+        const val INTERNET_PERMISSION = "android.permission.INTERNET"
+        val PERMISSION_REQUEST_TAGS = listOf("uses-permission", "uses-permission-sdk-23")
+    }
 }
